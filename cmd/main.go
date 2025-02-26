@@ -25,11 +25,16 @@ func main() {
 	service := services.NewUserService(userRepo)
 	handler := http.NewUserHandler(service)
 
+	productRepo := persistence.NewProductRepositoryImpl(db)
+	prouctService := services.NewProductService(productRepo)
+	productHandler := http.NewProductHandler(prouctService)
+
 	httpServer := gin.Default()
 
 	// Swagger route
 	httpServer.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	// ? USER ROUTES
 	httpServer.GET("/users", handler.GetAllUsers)
 	httpServer.POST("/register", handler.RegisterUser)
 	httpServer.PUT("/update", handler.Update)
@@ -41,6 +46,12 @@ func main() {
 			"APIs":    "GET /users, POST /register, PUT /update, GET /get-by-id, DELETE /delete",
 		})
 	})
+	// ? PRODUCTS ROUTES
+	httpServer.GET("/products", productHandler.GetAllProduct)
+	httpServer.POST("/create-product", productHandler.CreateProduct)
+	// httpServer.PUT("/update", productHandler.UpdateProduct)
+	httpServer.GET("/get-product-by-id:/id", productHandler.GetProductById)
+	// httpServer.DELETE("/delete", productHandler.DeleteProduct)
 
 	httpServer.Run(": 8080")
 }
